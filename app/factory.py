@@ -9,7 +9,7 @@ from .models import Event, DomainError
 # kind -> (default fee, max capacity)
 EVENT_KINDS = {
     "seminar": (0.0, 300),
-    "workshop": (200.0, 40),
+    "workshop": (180.0, 50),
     "concert": (500.0, 1000),
 }
 
