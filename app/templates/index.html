@@ -1,0 +1,19 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Campus Events</title></head>
+<body>
+<h1 id="heading">Campus Events</h1>
+{% if error %}<p id="error" style="color:red">{{ error }}</p>{% endif %}
+<ul id="event-list">
+{% for e in events %}<li class="event">{{ e.title }} ({{ e.kind }}, {{ e.date }}, cap {{ e.capacity }})</li>{% endfor %}
+</ul>
+<h2>Add event</h2>
+<form id="event-form" method="post" action="/ui/events">
+  <input name="title" id="title" placeholder="Title">
+  <select name="kind" id="kind">
+    <option>seminar</option><option>workshop</option><option>concert</option>
+  </select>
+  <input name="date" id="date" placeholder="YYYY-MM-DD">
+  <input name="capacity" id="capacity" placeholder="Capacity">
+  <button type="submit" id="submit">Create</button>
+</form>
+</body></html>

@@ -1,0 +1,3 @@
+# Viva prep (5 minutes) – be able to answer
+1. Why Incremental? 2. Show the Factory/Strategy/Observer/Adapter in code and the rejected alternative. 3. What does a Mock isolate in test_registration_service.py? Why is payment failure test asserting `regs.add` not called? 4. Walk through one TDD cycle in your git log. 5. Show the merge conflict and how you resolved it. 6. Why OpenAPI over Postman? Show the sync test. 7. What does CI run? 8. How would you add a new event kind / new discount? (one dict entry / one new class). 9. Which parts did AI help with, and can you explain them?
+Demo script: open `/` -> create event -> open `/docs` -> POST user -> POST register -> show console e-mail -> show green CI + coverage.
