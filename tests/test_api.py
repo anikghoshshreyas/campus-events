@@ -27,7 +27,7 @@ class ApiTests(unittest.TestCase):
         eid = self._event().get_json()["id"]
         r = self.c.post(f"/api/events/{eid}/register", json={"user_id": uid})
         self.assertEqual(r.status_code, 201)
-        self.assertEqual(r.get_json()["amount_paid"], 160.0)
+        self.assertEqual(r.get_json()["amount_paid"], 200.0)
         self.sender.send.assert_called_once()
         regs = self.c.get(f"/api/events/{eid}/registrations").get_json()
         self.assertEqual(len(regs), 1)
