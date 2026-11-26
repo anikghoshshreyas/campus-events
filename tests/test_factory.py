@@ -31,3 +31,7 @@ class EventFactoryTests(unittest.TestCase):
     def test_negative_fee_rejected(self):
         with self.assertRaises(DomainError):
             EventFactory.create("seminar", "x", "2027-01-10", fee=-5)
+
+    def test_hackathon_defaults(self):
+        e = EventFactory.create("hackathon", "CodeFest", "2027-02-10")
+        self.assertEqual((e.base_fee, e.capacity), (300.0, 100))
