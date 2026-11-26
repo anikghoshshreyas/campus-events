@@ -7,70 +7,80 @@ paths:
   /api/users:
     get:
       summary: List users
-      responses: {"200": {description: OK}}
+      responses: { "200": { description: OK } }
     post:
       summary: Create a user
       requestBody:
         required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/UserIn'}
+            schema: { $ref: "#/components/schemas/UserIn" }
       responses:
-        "201": {description: Created}
-        "400": {description: Validation error}
-        "409": {description: Email already registered}
+        "201": { description: Created }
+        "400": { description: Validation error }
+        "409": { description: Email already registered }
   /api/events:
     get:
       summary: List events
-      responses: {"200": {description: OK}}
+      responses: { "200": { description: OK } }
     post:
       summary: Create an event (Factory picks defaults by kind)
       requestBody:
         required: true
         content:
           application/json:
-            schema: {$ref: '#/components/schemas/EventIn'}
+            schema: { $ref: "#/components/schemas/EventIn" }
       responses:
-        "201": {description: Created}
-        "400": {description: Validation error}
+        "201": { description: Created }
+        "400": { description: Validation error }
   /api/events/{event_id}/register:
     post:
       summary: Register a user (price via Strategy, payment via Adapter)
       parameters:
-        - {name: event_id, in: path, required: true, schema: {type: integer}}
+        - {
+            name: event_id,
+            in: path,
+            required: true,
+            schema: { type: integer },
+          }
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              properties: {user_id: {type: integer}}
+              properties: { user_id: { type: integer } }
       responses:
-        "201": {description: Registered}
-        "402": {description: Payment failed}
-        "404": {description: Not found}
-        "409": {description: Duplicate or event full}
+        "201": { description: Registered }
+        "402": { description: Payment failed }
+        "404": { description: Not found }
+        "409": { description: Duplicate or event full }
   /api/events/{event_id}/registrations:
     get:
       summary: List registrations of an event
       parameters:
-        - {name: event_id, in: path, required: true, schema: {type: integer}}
-      responses: {"200": {description: OK}}
+        - {
+            name: event_id,
+            in: path,
+            required: true,
+            schema: { type: integer },
+          }
+      responses: { "200": { description: OK } }
 components:
   schemas:
     UserIn:
       type: object
       required: [name, email]
       properties:
-        name: {type: string}
-        email: {type: string}
-        role: {type: string, enum: [student, staff, guest]}
+        name: { type: string }
+        email: { type: string }
+        role: { type: string, enum: [student, staff, guest] }
     EventIn:
       type: object
       required: [kind, title, date]
       properties:
-        kind: {type: string, enum: [seminar, workshop, concert]}
-        title: {type: string}
-        date: {type: string, example: "2027-01-10"}
-        capacity: {type: integer}
-        fee: {type: number}
+        kind: { type: string, enum: [seminar, workshop, concert, hackathon] }
+        title: { type: string }
+        date: { type: string, example: "2027-01-10" }
+        capacity: { type: integer }
+        fee: { type: number }
