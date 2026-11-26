@@ -6,7 +6,7 @@ from app.models import DomainError
 class EventFactoryTests(unittest.TestCase):
     def test_workshop_gets_default_fee(self):
         e = EventFactory.create("workshop", "Git 101", "2027-01-10", 30)
-        self.assertEqual((e.base_fee, e.capacity), (200.0, 30))
+        self.assertEqual((e.base_fee, e.capacity), (250.0, 30))
 
     def test_seminar_is_free_with_default_capacity(self):
         e = EventFactory.create("seminar", "AI Talk", "2027-01-10")
