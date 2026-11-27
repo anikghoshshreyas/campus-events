@@ -1,9 +1,44 @@
-# 5. New tool: OpenAPI / Swagger (self-directed)
+# 5. New Tool: OpenAPI / Swagger (Self-Directed Learning)
 
-**Why:** my API had no contract; teammates/graders had to read the code. **Alternative compared:** Postman collection (good for manual calls, but a separate artifact that drifts from the code and is not machine-checked in CI). **Applied for real:** wrote `openapi.yaml`, served Swagger UI at `/docs`, and added `test_every_api_route_is_documented_in_openapi`, which fails CI when a route is added without documentation.
-**Resources I used:** (fill in: official OpenAPI docs, a tutorial/video, ChatGPT/Claude explanations – rate each honestly).
+## Why I chose it
 
-## Learning log (fill in with REAL dates and what you actually did)
-| Date | Time spent | What I did | Problem hit | How I solved it |
-|---|---|---|---|---|
-| | | | | |
+My Campus Event Manager exposes a REST API (users, events, registration), but the API had no contract: anyone using it had to read my code to find the endpoints, the request fields and the error codes (400, 402, 404, 409). OpenAPI describes all of that in one file, and Swagger UI turns it into a page where the API can be tried from the browser. Swagger/OpenAPI is in the assignment's list of documentation tools, and it was not practiced in the sessional.
+
+## Alternative compared: Postman
+
+Postman is good for sending test requests by hand, but a Postman collection is a separate file that is not checked against the code, so it drifts out of date silently. With OpenAPI the spec lives in the repository and I could add an automated test that fails when a route is missing from the spec. I rejected Postman for that reason.
+
+## How I applied it in the project (not just a demo)
+
+- Wrote `openapi.yaml` for all 6 API endpoints with request schemas and response codes.
+- Served Swagger UI at `/docs` and the spec at `/openapi.yaml`.
+- Added a test (`test_every_api_route_is_documented_in_openapi` in `tests/test_api.py`) that compares the Flask routes with the spec, so CI fails if an endpoint is undocumented.
+- Used Swagger UI to test the real flow: create user, create event, register, plus the error cases (duplicate email gave 409).
+- Updated the spec when I added a new event kind (`hackathon`) in the same pull request as the code change.
+
+## Learning log
+
+| Date       | Time spent | What I did                                                                                                                                                         | Problem hit                                                                                                                                                                        | How I solved it                                                                                                                                                                                                                                   |
+| ---------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-27 | ~30 min    | Learned what OpenAPI and Swagger UI are and opened `/docs` for the first time                                                                                      | Did not know what a "Swagger page" was or how it differs from OpenAPI                                                                                                              | Read the explanation: OpenAPI is the description file, Swagger UI is the page generated from it. Then I explored the page myself                                                                                                                  |
+| 2026-11-27 | ~40 min    | Tested the endpoints from the Swagger page: created two users, an event, and registered a user (price 160 = 200 minus 20% student discount)                        | The register form needed both `event_id` and `user_id`, and the example body showed `user_id: 0`                                                                                   | Used the real ids from the earlier responses (user 2, event 2). Also tried a duplicate email and got 409, which confirmed the rules work                                                                                                          |
+| 2026-11-27 | ~45 min    | Ran the full test suite and Selenium UI tests                                                                                                                      | 2 Selenium tests failed (40 passed, 2 failed): the test read the event list before the page had reloaded after the form submit                                                     | Added an explicit wait (`WebDriverWait`) in the test so it waits for the redirect to finish. Both tests then passed                                                                                                                               |
+| 2026-11-27 | ~15 min    | Raised coverage from 99% to 100%                                                                                                                                   | One line (`ConsoleSender.send`) was never executed because tests use a mock sender                                                                                                 | Wrote a small test that captures printed output                                                                                                                                                                                                   |
+| 2026-11-27 | ~60 min    | Practiced the Git workflow: first commit and push, CI run, feature branch with TDD commits (failing test, then code, then docs) for the new `hackathon` event kind | My first commit on the branch said "nothing to commit" because I had not saved the file                                                                                            | Saved the file, used `git diff` to confirm the change, then committed                                                                                                                                                                             |
+| 2026-11-27 | ~30 min    | Updated `openapi.yaml` to add `hackathon` to the `kind` enum                                                                                                       | VS Code (Prettier) reformatted the whole YAML file on save, so the commit showed 35 insertions and 25 deletions instead of one line                                                | Checked that the tests still passed (the spec-sync test validates the file) and explained the large diff in the pull request description                                                                                                          |
+| 2026-11-27 | ~45 min    | Created and resolved a real merge conflict in `app/factory.py` (two branches changed the same workshop line)                                                       | My first attempt did not conflict: the fee commit landed on `main` by mistake because I switched branches before the edit was committed, so the second branch already contained it | Moved the commit to its own branch with `cherry-pick`, reset `main` to match GitHub, rebuilt the second branch, merged again and got the conflict. Resolved it manually and re-ran the tests `[CHECK: edit if you changed any test expectations]` |
+| 2026-11-27 | ~20 min    | Merged `main` into the hackathon branch to keep its pull request up to date, and opened a README pull request                                                      | Learning-log commit was empty the first time for the same reason as above (file not saved)                                                                                         | Edited and saved the file first, then used `git status` to confirm it was modified before committing                                                                                                                                              |
+
+## Resources I used and my evaluation
+
+**1. Claude (AI assistant, this conversation)** was the main resource. It generated the starter project, the tests and the step-by-step instructions, and it explained OpenAPI and Swagger in plain language. It was fast and gave exact commands, which helped a lot with Git. It was not always right, so I verified everything by running it: it gave a wrong test count once (said 43, real was 41), told me a change would not break tests before correcting itself, and its first Selenium test failed because it did not wait for the page to load. I fixed those by reading the error output. Verdict: very useful for speed and for explaining ideas, but its output has to be run and checked, not trusted blindly.
+
+**2. Swagger UI itself (`/docs`)** was the best way to understand the tool. Trying each endpoint and seeing the real responses taught me more than reading about it, and the 409 and 400 responses showed what the documented error codes mean in practice. Limitation: it needs an internet connection because the page loads its styling from a CDN.
+
+**3. Terminal and test error messages** were the most reliable source of truth. Reading the pytest failure and the Git conflict output showed exactly what was wrong each time.
+
+**4. [Add any other resource you really used, such as official OpenAPI documentation, a YouTube video or a classmate, with an honest rating. Delete this line if there is none.]**
+
+## What I would do differently
+
+Write the OpenAPI spec before the endpoints (design first), and run `git status` and `git diff` before every commit to avoid empty or misplaced commits.
